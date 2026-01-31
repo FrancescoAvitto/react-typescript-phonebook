@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import ContactList from './components/ContactList';
 import ContactForm from './components/ContactForm';
 import SearchBar from './components/SearchBar';
@@ -84,15 +84,76 @@ const App: React.FC = () => {
         }
     };
 
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleExport = () => {
+        const json = JSON.stringify(contacts, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'contacts.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const handleImportClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target?.result as string;
+                const importedContacts = JSON.parse(content);
+                if (Array.isArray(importedContacts)) {
+                    setContacts(importedContacts);
+                    alert('Contatti importati con successo!');
+                } else {
+                    alert('Il file JSON non è valido.');
+                }
+            } catch (error) {
+                alert('Errore durante la lettura del file.');
+            }
+        };
+        reader.readAsText(file);
+        // Reset input
+        event.target.value = '';
+    };
+
     return (
         <div className="container-wrapper">
             <div className="container">
                 <header className="header">
                     <h1>Rubrica</h1>
                     {!isCreating && !editingId && (
-                        <button onClick={() => setIsCreating(true)} className="add-button">
-                            + Nuovo
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept=".json"
+                                onChange={handleFileChange}
+                            />
+                            <button onClick={handleImportClick} className="add-button" style={{ backgroundColor: '#2196F3' }}>
+                                Importa
+                            </button>
+                            <button onClick={handleExport} className="add-button" style={{ backgroundColor: '#4CAF50' }}>
+                                Esporta
+                            </button>
+                            <button onClick={() => setIsCreating(true)} className="add-button">
+                                + Nuovo
+                            </button>
+                        </div>
                     )}
                 </header>
 
