@@ -12,6 +12,9 @@ const lastNames = [
     'Barbieri', 'Fontana', 'Santoro', 'Mariani', 'Rinaldi', 'Caruso', 'Ferrara', 'Galli', 'Martini', 'Leone'
 ];
 
+export const GROUPS = ['Famiglia', 'Lavoro', 'Amici', 'Altro'];
+const TAGS = ['Palestra', 'Calcetto', 'Urgenze', 'VIP', 'Scuola', 'Colleghi'];
+
 const generatePhoneNumber = () => {
     const prefix = '3' + Math.floor(Math.random() * 10) + Math.floor(Math.random() * 10);
     const number = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
@@ -29,6 +32,11 @@ export const generateInitialContacts = (count: number): Contact[] => {
             firstName: randomFirstName,
             lastName: randomLastName,
             phone: generatePhoneNumber(),
+            group: GROUPS[Math.floor(Math.random() * GROUPS.length)],
+            tags: [
+                TAGS[Math.floor(Math.random() * TAGS.length)],
+                Math.random() > 0.5 ? TAGS[Math.floor(Math.random() * TAGS.length)] : ''
+            ].filter(t => t !== '')
         });
     }
     return contacts;

@@ -17,7 +17,21 @@ const ContactItem: React.FC<ContactItemProps> = ({ contact, onEdit, onDelete }) 
             padding: '0.5rem 0'
         }}>
             <div>
-                <strong>{contact.firstName} {contact.lastName}</strong>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <strong>{contact.firstName} {contact.lastName}</strong>
+                    {contact.group && (
+                        <span style={{
+                            backgroundColor: '#ffba47',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.75rem',
+                            color: '#333',
+                            fontWeight: 'bold'
+                        }}>
+                            {contact.group}
+                        </span>
+                    )}
+                </div>
                 <div style={{ color: '#666', fontSize: '0.9rem' }}>{contact.phone}</div>
             </div>
             <div>

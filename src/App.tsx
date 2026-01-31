@@ -13,23 +13,42 @@ const App: React.FC = () => {
     const [isCreating, setIsCreating] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
+    const [selectedGroup, setSelectedGroup] = useState<string>('');
+    const [tagFilter, setTagFilter] = useState<string>('');
+
     const contactToEdit = editingId ? contacts.find(c => c.id === editingId) : null;
 
     // LOGICA DI FILTRO E ORDINAMENTO
     const processedContacts = useMemo(() => {
         // 1. Filtra
         let filtered = contacts;
+
+        // Filtro testuale
         if (searchTerm) {
             const lowerTerm = searchTerm.toLowerCase();
-            filtered = contacts.filter(c =>
+            filtered = filtered.filter(c =>
                 c.firstName.toLowerCase().includes(lowerTerm) ||
                 c.lastName.toLowerCase().includes(lowerTerm) ||
                 c.phone.includes(lowerTerm)
             );
         }
+
+        // Filtro Gruppo
+        if (selectedGroup) {
+            filtered = filtered.filter(c => c.group === selectedGroup);
+        }
+
+        // Filtro Tag
+        if (tagFilter) {
+            const lowerTag = tagFilter.toLowerCase();
+            filtered = filtered.filter(c =>
+                c.tags && c.tags.some(t => t.toLowerCase().includes(lowerTag))
+            );
+        }
+
         // 2. Ordina
         return sortContacts(filtered);
-    }, [contacts, searchTerm]);
+    }, [contacts, searchTerm, selectedGroup, tagFilter]);
 
     // 3. Raggruppa
     const groupedContacts = useMemo(() => groupContactsByLetter(processedContacts), [processedContacts]);
@@ -89,7 +108,14 @@ const App: React.FC = () => {
                         />
                     ) : (
                         <>
-                            <SearchBar value={searchTerm} onChange={setSearchTerm} />
+                            <SearchBar
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                                selectedGroup={selectedGroup}
+                                onGroupChange={setSelectedGroup}
+                                tagFilter={tagFilter}
+                                onTagChange={setTagFilter}
+                            />
                             <ContactList
                                 groupedContacts={groupedContacts}
                                 onEdit={(id) => {

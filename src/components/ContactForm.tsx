@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Contact, ContactFormData } from '../types';
+import { GROUPS } from '../utils';
 
 interface ContactFormProps {
     initialData?: Contact | null;
@@ -13,6 +14,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, onSubmit, onCanc
         firstName: '',
         lastName: '',
         phone: '',
+        group: GROUPS[0],
+        tags: []
     });
 
     // Effetto per popolare il form quando si è in modalità modifica (initialData cambia)
@@ -22,10 +25,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, onSubmit, onCanc
                 firstName: initialData.firstName,
                 lastName: initialData.lastName,
                 phone: initialData.phone,
+                group: initialData.group || GROUPS[0],
+                tags: initialData.tags || []
             });
         } else {
             // Reset se si passa a modalità creazione
-            setFormData({ firstName: '', lastName: '', phone: '' });
+            setFormData({ firstName: '', lastName: '', phone: '', group: GROUPS[0], tags: [] });
         }
     }, [initialData]);
 
@@ -42,7 +47,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, onSubmit, onCanc
         e.preventDefault();
         onSubmit(formData);
         // Reset del form dopo l'invio (opzionale, utile se si rimane sulla schermata)
-        setFormData({ firstName: '', lastName: '', phone: '' });
+        // Reset del form dopo l'invio (opzionale, utile se si rimane sulla schermata)
+        setFormData({ firstName: '', lastName: '', phone: '', group: GROUPS[0], tags: [] });
     };
 
     return (
@@ -72,6 +78,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ initialData, onSubmit, onCanc
                     value={formData.phone}
                     onChange={handleChange}
                     required
+                />
+                <select
+                    name="group"
+                    value={formData.group}
+                    onChange={(e) => setFormData({ ...formData, group: e.target.value })}
+                    style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                    {GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+                <input
+                    type="text"
+                    name="tags"
+                    placeholder="Tag (separati da virgola)"
+                    value={formData.tags.join(', ')}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(',').map(t => t.trim()) })}
+                    style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                     <button type="submit" style={{ cursor: 'pointer', padding: '0.5rem 1rem', backgroundColor: '#ffa420', color: 'white' }}>
